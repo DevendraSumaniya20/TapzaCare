@@ -59,13 +59,15 @@ export const api = createApi({
   reducerPath: 'api',
   baseQuery: mockBaseQuery,
   refetchOnReconnect: true,
-  tagTypes: ['Slots'],
+  tagTypes: ['Slots', 'Config'],
   endpoints: build => ({
     // The argument only keys the cache, so switching day or language refetches. The mock reads both itself.
     getConfig: build.query<
       ConfigResult,
       { variant: ConfigVariant; language: Language }
     >({
+      // Lets the admin screen force a refetch after publishing an edit.
+      providesTags: ['Config'],
       queryFn: async (_key, _api, _options, baseQuery) => {
         const response = await baseQuery({ method: 'GET', path: '/config' });
         if (!response.error) {

@@ -16,6 +16,7 @@ import { OfflineBanner } from '../components/OfflineBanner';
 import { getIcon } from '../constants/icons';
 import { useConfig } from '../hooks/useConfig';
 import { useTheme } from '../hooks/useTheme';
+import { ConfigAdminScreen } from '../screens/ConfigAdminScreen';
 import { BookingScreen } from '../screens/BookingScreen';
 import { BookingsScreen } from '../screens/BookingsScreen';
 import { HomeScreen } from '../screens/HomeScreen';
@@ -133,6 +134,14 @@ export function RootNavigator() {
           component={PrescriptionDetailScreen}
           options={{
             title: t('prescriptions.detailTitle'),
+            headerBackButtonDisplayMode: 'minimal',
+          }}
+        />
+        <Stack.Screen
+          name="ConfigAdmin"
+          component={ConfigAdminScreen}
+          options={{
+            title: t('admin.title'),
             headerBackButtonDisplayMode: 'minimal',
           }}
         />

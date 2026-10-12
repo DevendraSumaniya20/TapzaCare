@@ -1,6 +1,7 @@
 import {
   mockRequest,
   resetMockServer,
+  setConfigOverride,
   type MockSettings,
 } from '../src/services/mockServer';
 import type { LayoutConfig, Slot } from '../src/types/api';
@@ -42,6 +43,30 @@ describe('mock server', () => {
     );
     const labels = (hindi.data as LayoutConfig).tabs.map(tab => tab.label);
     expect(labels).toEqual(['होम', 'बुकिंग', 'पर्चे', 'प्रोफ़ाइल']);
+  });
+
+  it('serves what the admin published, and the shipped config again after a reset', async () => {
+    const shipped = (
+      await mockRequest({ method: 'GET', path: '/config' }, settings)
+    ).data as LayoutConfig;
+    setConfigOverride('normal', {
+      ...shipped,
+      version: 99,
+      sections: [...shipped.sections].reverse(),
+    });
+
+    const edited = (
+      await mockRequest({ method: 'GET', path: '/config' }, settings)
+    ).data as LayoutConfig;
+    expect(edited.version).toBe(99);
+    expect(edited.sections[0].id).toBe(
+      shipped.sections[shipped.sections.length - 1].id,
+    );
+
+    setConfigOverride('normal', null);
+    expect(
+      (await mockRequest({ method: 'GET', path: '/config' }, settings)).data,
+    ).toEqual(shipped);
   });
 
   it('fails only the endpoints the failure switch names', async () => {

@@ -1,10 +1,13 @@
 import { ScrollView, StyleSheet } from 'react-native';
+import { useNavigation, type NavigationProp } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '../components/AppText';
 import { OptionGroup } from '../components/OptionGroup';
+import { PrimaryButton } from '../components/PrimaryButton';
 import { useConfig } from '../hooks/useConfig';
 import { useTheme } from '../hooks/useTheme';
+import type { RootStackParamList } from '../navigation/types';
 import { LANGUAGES, saveLanguage, type Language } from '../i18n';
 import type { ConfigVariant, FailureMode } from '../services/mockServer';
 import { useAppDispatch, useAppSelector } from '../store';
@@ -28,6 +31,7 @@ export function ProfileScreen() {
   const { t } = useTranslation();
   const { colors, spacing } = useTheme();
   const insets = useSafeAreaInsets();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const dispatch = useAppDispatch();
   const settings = useAppSelector(state => state.settings);
   const { config, source } = useConfig();
@@ -64,6 +68,7 @@ export function ProfileScreen() {
       contentContainerStyle={{
         padding: spacing.lg,
         paddingTop: insets.top + spacing.lg,
+        paddingBottom: spacing.xxl,
         gap: spacing.xl,
       }}
     >
@@ -110,6 +115,10 @@ export function ProfileScreen() {
         options={failures}
         selected={settings.failure}
         onSelect={value => dispatch(setFailure(value))}
+      />
+      <PrimaryButton
+        label={t('admin.open')}
+        onPress={() => navigation.navigate('ConfigAdmin')}
       />
     </ScrollView>
   );

@@ -9,4 +9,5 @@ export type RootStackParamList = {
   // Opened from a doctor (id known) or from a service / quick action (user picks the doctor).
   Booking: { doctorId?: string } | undefined;
   PrescriptionDetail: { prescriptionId: string };
+  ConfigAdmin: undefined;
 };

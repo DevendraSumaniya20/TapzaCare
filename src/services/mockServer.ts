@@ -3,7 +3,7 @@ import { localize } from '../data/configTranslations';
 import { doctors } from '../data/doctors';
 import { prescriptions } from '../data/prescriptions';
 import type { Language } from '../i18n';
-import type { Booking, Slot } from '../types/api';
+import type { Booking, LayoutConfig, Slot } from '../types/api';
 
 export type ConfigVariant = 'normal' | 'festival';
 // Which endpoints the mock should fail, so one flow can be broken while the rest works.
@@ -28,6 +28,23 @@ export type MockResponse = { status: number; data: unknown };
 
 // Server-side memory of taken slots; lives for the app session, like a real backend would outlive a screen.
 const bookedSlotIds = new Set<string>();
+
+// What an admin has published over the shipped configs. Stands in for the backend's config store.
+const configOverrides: Partial<Record<ConfigVariant, LayoutConfig>> = {};
+
+/** The config currently served for a day, before translation: the admin's version, else the shipped one. */
+export const getServedConfig = (variant: ConfigVariant): LayoutConfig =>
+  configOverrides[variant] ??
+  (variant === 'festival' ? festivalConfig : normalConfig);
+
+/** The admin screen's "publish". Passing null goes back to the shipped config. */
+export function setConfigOverride(
+  variant: ConfigVariant,
+  config: LayoutConfig | null,
+): void {
+  if (config) configOverrides[variant] = config;
+  else delete configOverrides[variant];
+}
 
 const delay = (ms: number) =>
   new Promise<void>(resolve => setTimeout(resolve, ms));
@@ -116,10 +133,7 @@ export async function mockRequest(
     case '/config':
       return {
         status: 200,
-        data: localize(
-          settings.variant === 'festival' ? festivalConfig : normalConfig,
-          settings.language,
-        ),
+        data: localize(getServedConfig(settings.variant), settings.language),
       };
     case '/doctors':
       return { status: 200, data: doctors };
@@ -138,5 +152,9 @@ export async function mockRequest(
   }
 }
 
-/** Test helper: forget every booking. */
-export const resetMockServer = () => bookedSlotIds.clear();
+/** Test helper: forget every booking and admin edit. */
+export const resetMockServer = () => {
+  bookedSlotIds.clear();
+  setConfigOverride('normal', null);
+  setConfigOverride('festival', null);
+};
