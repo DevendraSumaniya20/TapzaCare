@@ -1,4 +1,4 @@
-import { ScrollView } from 'react-native';
+import { ScrollView, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '../components/AppText';
@@ -60,7 +60,12 @@ export function ProfileScreen() {
         gap: spacing.xl,
       }}
     >
-      <AppText variant="title" bold>
+      <AppText
+        variant="title"
+        bold
+        accessibilityRole="header"
+        style={styles.title}
+      >
         {t('profile.title')}
       </AppText>
       <OptionGroup
@@ -96,3 +101,7 @@ export function ProfileScreen() {
     </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  title: { textAlign: 'center' },
+});
