@@ -1,5 +1,5 @@
 import { useNavigation, type NavigationProp } from '@react-navigation/native';
-import type { RootStackParamList } from '../navigation/types';
+import type { Rect, RootStackParamList } from '../navigation/types';
 import type { TabScreen } from '../types/api';
 import { useConfig } from './useConfig';
 
@@ -18,8 +18,9 @@ export function useGoToTab() {
   };
 }
 
-/** Opens the booking flow, optionally with a doctor already chosen. */
+/** Opens the booking flow, optionally with a doctor already chosen and their photo's position for the transition. */
 export function useOpenBooking() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  return (doctorId?: string) => navigation.navigate('Booking', { doctorId });
+  return (doctorId?: string, photoOrigin?: Rect) =>
+    navigation.navigate('Booking', { doctorId, photoOrigin });
 }

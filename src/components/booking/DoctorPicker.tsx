@@ -1,3 +1,4 @@
+import { useRef, type ComponentRef } from 'react';
 import { FlatList, Pressable, StyleSheet, View } from 'react-native';
 import { Stethoscope } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
@@ -6,6 +7,7 @@ import { scale } from 'react-native-size-matters';
 import { usePulse } from '../../hooks/usePulse';
 import { useTheme } from '../../hooks/useTheme';
 import { useGetDoctorsQuery } from '../../services/api';
+import type { Rect } from '../../navigation/types';
 import type { Doctor } from '../../types/api';
 import { withAlpha } from '../../utils/color';
 import { formatInr } from '../../utils/format';
@@ -21,10 +23,15 @@ const PHOTO = scale(56);
 type Props = {
   selectedId?: string;
   onSelect: (doctor: Doctor) => void;
+  // Shown first in the list, so a doctor chosen before arriving is on screen without scrolling.
+  firstId?: string;
+  // While a photo is flying in for this doctor, their real photo stays hidden and reports where it sits.
+  flight?: { doctorId: string; onTarget: (rect: Rect) => void };
 };
 
 /** Horizontal list of doctors from GET /doctors, with its own loading, error and empty states. */
-export function DoctorPicker({ selectedId, onSelect }: Props) {
+export function DoctorPicker({ selectedId, onSelect, firstId, flight }: Props) {
+  const flightPhoto = useRef<ComponentRef<typeof View>>(null);
   const { t } = useTranslation();
   const { colors, spacing, radius } = useTheme();
   const { data: doctors, isLoading, isError, refetch } = useGetDoctorsQuery();
@@ -73,10 +80,15 @@ export function DoctorPicker({ selectedId, onSelect }: Props) {
     );
   }
 
+  const ordered = [
+    ...doctors.filter(doctor => doctor.id === firstId),
+    ...doctors.filter(doctor => doctor.id !== firstId),
+  ];
+
   return (
     <FlatList
       horizontal
-      data={doctors}
+      data={ordered}
       keyExtractor={doctor => doctor.id}
       showsHorizontalScrollIndicator={false}
       contentContainerStyle={{ paddingHorizontal: spacing.lg, gap: spacing.md }}
@@ -109,10 +121,28 @@ export function DoctorPicker({ selectedId, onSelect }: Props) {
               },
             ]}
           >
-            <RemoteImage
-              uri={item.photoUrl}
-              style={[styles.photo, { borderRadius: radius.pill }]}
-            />
+            <View
+              collapsable={false}
+              ref={item.id === flight?.doctorId ? flightPhoto : undefined}
+              onLayout={
+                item.id === flight?.doctorId
+                  ? () =>
+                      flightPhoto.current?.measureInWindow(
+                        (x, y, width, height) =>
+                          flight.onTarget({ x, y, width, height }),
+                      )
+                  : undefined
+              }
+              style={[
+                styles.photoBox,
+                item.id === flight?.doctorId ? styles.hidden : null,
+              ]}
+            >
+              <RemoteImage
+                uri={item.photoUrl}
+                style={[styles.photo, { borderRadius: radius.pill }]}
+              />
+            </View>
             <AppText bold numberOfLines={2}>
               {item.name}
             </AppText>
@@ -137,6 +167,8 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row' },
   card: { width: CARD_WIDTH, minHeight: CARD_HEIGHT },
   cardBorder: { borderWidth: 1.5 },
+  hidden: { opacity: 0 },
+  photoBox: { alignSelf: 'flex-start' },
   photo: { width: PHOTO, height: PHOTO },
   state: { minHeight: CARD_HEIGHT * 1.6 },
 });

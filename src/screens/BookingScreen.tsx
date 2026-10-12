@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useCallback, useRef, useState, type ComponentRef } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import type BottomSheet from '@gorhom/bottom-sheet';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -8,11 +8,12 @@ import { AppText } from '../components/AppText';
 import { BookingResult } from '../components/booking/BookingResult';
 import { DateStrip } from '../components/booking/DateStrip';
 import { DoctorPicker } from '../components/booking/DoctorPicker';
+import { FlyingPhoto } from '../components/booking/FlyingPhoto';
 import { SlotSheet } from '../components/booking/SlotSheet';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { useGoToTab } from '../hooks/useGoToTab';
 import { useTheme } from '../hooks/useTheme';
-import type { RootStackParamList } from '../navigation/types';
+import type { Rect, RootStackParamList } from '../navigation/types';
 import { useGetDoctorsQuery } from '../services/api';
 import { useAppDispatch, useAppSelector } from '../store';
 import { bookSlot } from '../store/bookingsSlice';
@@ -41,6 +42,16 @@ export function BookingScreen({ route }: Props) {
   const [date, setDate] = useState(() => toDateKey(new Date()));
   const [bookingLocalId, setBookingLocalId] = useState<string>();
 
+  // Shared-element transition: the doctor's photo flies from where it was on Home to its card here.
+  const photoOrigin = route.params?.photoOrigin;
+  const [flying, setFlying] = useState(Boolean(photoOrigin));
+  const [photoTarget, setPhotoTarget] = useState<Rect>();
+  const screenRef = useRef<ComponentRef<typeof View>>(null);
+  // Unknown until this screen has been laid out; the flying photo is not drawn before that,
+  // or it would first appear in the wrong place.
+  const [screenOffset, setScreenOffset] = useState<{ x: number; y: number }>();
+  const endFlight = useCallback(() => setFlying(false), []);
+
   const doctor = doctors?.find(candidate => candidate.id === doctorId);
   const booking = useAppSelector(state =>
     state.bookings.find(candidate => candidate.localId === bookingLocalId),
@@ -66,7 +77,13 @@ export function BookingScreen({ route }: Props) {
   }
 
   return (
-    <View style={[styles.flex, { backgroundColor: colors.background }]}>
+    <View
+      ref={screenRef}
+      onLayout={() =>
+        screenRef.current?.measureInWindow((x, y) => setScreenOffset({ x, y }))
+      }
+      style={[styles.flex, { backgroundColor: colors.background }]}
+    >
       <ScrollView
         contentContainerStyle={{ paddingVertical: spacing.lg, gap: spacing.md }}
       >
@@ -80,7 +97,13 @@ export function BookingScreen({ route }: Props) {
         </AppText>
         <DoctorPicker
           selectedId={doctorId}
+          firstId={route.params?.doctorId}
           onSelect={selected => setDoctorId(selected.id)}
+          flight={
+            flying && route.params?.doctorId
+              ? { doctorId: route.params.doctorId, onTarget: setPhotoTarget }
+              : undefined
+          }
         />
 
         {doctor ? (
@@ -131,6 +154,15 @@ export function BookingScreen({ route }: Props) {
         date={date}
         onConfirm={confirm}
       />
+      {flying && photoOrigin && doctor && screenOffset ? (
+        <FlyingPhoto
+          uri={doctor.photoUrl}
+          from={photoOrigin}
+          to={photoTarget}
+          offset={screenOffset}
+          onDone={endFlight}
+        />
+      ) : null}
     </View>
   );
 }

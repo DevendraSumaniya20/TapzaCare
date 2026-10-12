@@ -124,10 +124,12 @@ export function RootNavigator() {
         <Stack.Screen
           name="Booking"
           component={BookingScreen}
-          options={{
+          options={({ route }) => ({
             title: t('booking.title'),
             headerBackButtonDisplayMode: 'minimal',
-          }}
+            // Cross-fade when a photo is flying in; a sliding screen would fight with it.
+            animation: route.params?.photoOrigin ? 'fade' : 'default',
+          })}
         />
         <Stack.Screen
           name="PrescriptionDetail"

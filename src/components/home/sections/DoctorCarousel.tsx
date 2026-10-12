@@ -1,8 +1,10 @@
+import { useRef, type ComponentRef } from 'react';
 import { FlatList, Pressable, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { scale } from 'react-native-size-matters';
 import { useOpenBooking } from '../../../hooks/useGoToTab';
 import { useTheme } from '../../../hooks/useTheme';
+import { useGetDoctorsQuery } from '../../../services/api';
 import { withAlpha } from '../../../utils/color';
 import { haptics } from '../../../utils/haptics';
 import { isText, parseItems } from '../../../utils/parseItems';
@@ -19,6 +21,10 @@ export function DoctorCarousel({ section, topInset }: SectionProps) {
   const { t } = useTranslation();
   const { colors, spacing, radius } = useTheme();
   const openBooking = useOpenBooking();
+  // Warms the /doctors cache while the user is still on Home, so the booking screen opens with its
+  // photos in place and the tapped photo has somewhere to fly to.
+  useGetDoctorsQuery();
+  const photos = useRef<Record<string, ComponentRef<typeof View> | null>>({});
   const doctors = parseItems(section.items, item =>
     isText(item.id) && isText(item.name) && isText(item.specialty)
       ? {
@@ -51,7 +57,11 @@ export function DoctorCarousel({ section, topInset }: SectionProps) {
             accessibilityLabel={`${item.name}, ${item.specialty}`}
             onPress={() => {
               haptics.tap();
-              openBooking(item.id);
+              const photo = photos.current[item.id];
+              if (!photo) return openBooking(item.id);
+              photo.measureInWindow((x, y, width, height) =>
+                openBooking(item.id, { x, y, width, height }),
+              );
             }}
             style={({ pressed }) => [
               styles.card,
@@ -65,10 +75,19 @@ export function DoctorCarousel({ section, topInset }: SectionProps) {
               },
             ]}
           >
-            <RemoteImage
-              uri={item.photoUrl}
-              style={[styles.photo, { borderRadius: radius.pill }]}
-            />
+            {/* Measured through a wrapper View: Image has no measure methods. collapsable keeps the View on Android. */}
+            <View
+              collapsable={false}
+              style={styles.photoBox}
+              ref={view => {
+                photos.current[item.id] = view;
+              }}
+            >
+              <RemoteImage
+                uri={item.photoUrl}
+                style={[styles.photo, { borderRadius: radius.pill }]}
+              />
+            </View>
             <AppText bold numberOfLines={2}>
               {item.name}
             </AppText>
@@ -108,6 +127,8 @@ export function DoctorCarousel({ section, topInset }: SectionProps) {
 
 const styles = StyleSheet.create({
   card: { width: CARD_WIDTH, borderWidth: StyleSheet.hairlineWidth },
+  // Hugs the photo, so measuring this View gives the photo's own position and size.
+  photoBox: { alignSelf: 'flex-start' },
   photo: { width: PHOTO, height: PHOTO },
   slot: { alignSelf: 'stretch' },
 });
