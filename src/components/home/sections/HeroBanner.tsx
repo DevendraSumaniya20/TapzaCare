@@ -7,6 +7,7 @@ import Animated, {
   useSharedValue,
 } from 'react-native-reanimated';
 import { scale } from 'react-native-size-matters';
+import { useConfig } from '../../../hooks/useConfig';
 import { useTheme } from '../../../hooks/useTheme';
 import { isText, parseItems } from '../../../utils/parseItems';
 import { AppText } from '../../AppText';
@@ -23,7 +24,8 @@ const MIN_HEIGHT = scale(190);
  */
 export function HeroBanner({ section, topInset = 0 }: SectionProps) {
   const { t } = useTranslation();
-  const { colors, spacing } = useTheme();
+  const { spacing } = useTheme();
+  const { config } = useConfig();
   const textColor = useSectionTextColor(section.background);
   const fallbackScroll = useSharedValue(0);
   const scrollY = useContext(HomeScrollContext) ?? fallbackScroll;
@@ -46,7 +48,7 @@ export function HeroBanner({ section, topInset = 0 }: SectionProps) {
   );
   if (!hero) return null;
 
-  const festival = colors.festival;
+  const festival = config.theme.festival;
 
   return (
     <View style={styles.container}>

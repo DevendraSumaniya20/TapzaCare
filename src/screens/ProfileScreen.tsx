@@ -9,10 +9,12 @@ import { LANGUAGES, saveLanguage, type Language } from '../i18n';
 import type { ConfigVariant, FailureMode } from '../services/mockServer';
 import { useAppDispatch, useAppSelector } from '../store';
 import {
+  setAppearance,
   setFailure,
   setLanguage,
   setLatency,
   setVariant,
+  type Appearance,
 } from '../store/settingsSlice';
 
 const SOURCE_KEY = {
@@ -30,6 +32,11 @@ export function ProfileScreen() {
   const settings = useAppSelector(state => state.settings);
   const { config, source } = useConfig();
 
+  const appearances: { value: Appearance; label: string }[] = [
+    { value: 'system', label: t('profile.appearanceSystem') },
+    { value: 'light', label: t('profile.appearanceLight') },
+    { value: 'dark', label: t('profile.appearanceDark') },
+  ];
   const variants: { value: ConfigVariant; label: string }[] = [
     { value: 'normal', label: t('profile.normalDay') },
     { value: 'festival', label: t('profile.festivalDay') },
@@ -73,6 +80,12 @@ export function ProfileScreen() {
         options={LANGUAGES}
         selected={settings.language}
         onSelect={changeLanguage}
+      />
+      <OptionGroup
+        label={t('profile.appearance')}
+        options={appearances}
+        selected={settings.appearance}
+        onSelect={value => dispatch(setAppearance(value))}
       />
       <AppText color={colors.textSecondary}>
         {t('profile.demoControls')}

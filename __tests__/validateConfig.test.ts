@@ -31,6 +31,17 @@ describe('validateConfig', () => {
     expect(config.sections).toHaveLength(normalConfig.sections.length);
   });
 
+  it('keeps a complete dark palette and ignores an incomplete one', () => {
+    expect(validateConfig(normalConfig).theme.dark).toEqual(
+      normalConfig.theme.dark,
+    );
+    const broken = validateConfig({
+      ...normalConfig,
+      theme: { ...normalConfig.theme, dark: { primary: '#000000' } },
+    });
+    expect(broken.theme.dark).toBeUndefined();
+  });
+
   it('defaults missing items to an empty list', () => {
     const [section] = validateConfig({
       ...normalConfig,

@@ -1,4 +1,5 @@
 import type { ComponentType } from 'react';
+import { StatusBar } from 'react-native';
 import {
   BottomTabBar,
   createBottomTabNavigator,
@@ -78,12 +79,13 @@ function Tabs() {
 /** Tabs at the root, with full-screen flows (booking) stacked on top of them. */
 export function RootNavigator() {
   const { t } = useTranslation();
-  const { colors } = useTheme();
+  const { colors, isDark } = useTheme();
 
   return (
     <NavigationContainer
       theme={{
         ...DefaultTheme,
+        dark: isDark,
         colors: {
           ...DefaultTheme.colors,
           primary: colors.primary,
@@ -93,6 +95,7 @@ export function RootNavigator() {
         },
       }}
     >
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
       <Stack.Navigator screenOptions={{ headerTintColor: colors.primary }}>
         <Stack.Screen
           name="Tabs"

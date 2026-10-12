@@ -29,7 +29,7 @@ const HEADER_SOLID_AFTER = 60;
 /** Home tab: renders the sections of the remote config, in config order, under a collapsing header. */
 export function HomeScreen() {
   const { t } = useTranslation();
-  const { colors } = useTheme();
+  const { colors, isDark, lightText } = useTheme();
   const { config, source, isLoading, isFetching, refetch } = useConfig();
   const isFocused = useIsFocused();
   const scrollY = useSharedValue(0);
@@ -55,8 +55,8 @@ export function HomeScreen() {
   const topRowColor = useSectionTextColor(
     sections[0]?.background ?? pageBackground,
   );
-  // Light status-bar icons only while a dark first section shows behind them.
-  const lightStatusBar = !headerSolid && topRowColor === colors.surface;
+  // Light status-bar icons over a dark first section, or over the solid header in dark mode.
+  const lightStatusBar = headerSolid ? isDark : topRowColor === lightText;
 
   if (isLoading) return <HomeSkeleton />;
 

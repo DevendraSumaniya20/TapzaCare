@@ -7,11 +7,15 @@ import type {
 } from '../services/mockServer';
 
 // Controls for the mock backend. Read by the API layer on every request.
-const initialState: MockSettings = {
+export type Appearance = 'system' | 'light' | 'dark';
+
+// The mock-backend controls, plus the one purely local preference: appearance.
+const initialState: MockSettings & { appearance: Appearance } = {
   variant: 'normal',
   language: 'en',
   latencyMs: 600,
   failure: 'none',
+  appearance: 'system',
 };
 
 const settingsSlice = createSlice({
@@ -24,6 +28,9 @@ const settingsSlice = createSlice({
     setLanguage: (state, action: PayloadAction<Language>) => {
       state.language = action.payload;
     },
+    setAppearance: (state, action: PayloadAction<Appearance>) => {
+      state.appearance = action.payload;
+    },
     setLatency: (state, action: PayloadAction<number>) => {
       state.latencyMs = action.payload;
     },
@@ -33,6 +40,11 @@ const settingsSlice = createSlice({
   },
 });
 
-export const { setVariant, setLanguage, setLatency, setFailure } =
-  settingsSlice.actions;
+export const {
+  setVariant,
+  setLanguage,
+  setAppearance,
+  setLatency,
+  setFailure,
+} = settingsSlice.actions;
 export default settingsSlice.reducer;

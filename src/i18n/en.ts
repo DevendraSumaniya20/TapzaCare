@@ -74,6 +74,10 @@ export const en = {
     emptyMessage: 'Prescriptions from your doctor will appear here.',
   },
   profile: {
+    appearance: 'Appearance',
+    appearanceSystem: 'System',
+    appearanceLight: 'Light',
+    appearanceDark: 'Dark',
     title: 'Profile',
     language: 'Language',
     demoControls: 'Demo controls for the mock server',

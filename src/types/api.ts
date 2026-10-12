@@ -29,6 +29,8 @@ export type SectionBackground = {
   kind: 'color' | 'gradient' | 'image';
   // color: one colour. gradient: comma-separated colours, top to bottom. image: URL.
   value: string;
+  // Optional replacement for `value` in dark mode. Not in the brief; added for config-driven dark mode.
+  darkValue?: string;
 };
 
 export type SectionConfig = {
@@ -42,7 +44,8 @@ export type SectionConfig = {
 
 export type LayoutConfig = {
   version: number;
-  theme: ThemeColors & { festival?: Festival };
+  // `dark` is an extension to the brief: the palette to use in dark mode, if the admin supplies one.
+  theme: ThemeColors & { festival?: Festival; dark?: ThemeColors };
   tabs: TabConfig[];
   sections: SectionConfig[];
 };

@@ -54,10 +54,23 @@ function parseSection(value: unknown): SectionConfig | null {
   return {
     id,
     type,
-    background: { kind, value: background.value },
+    background: isText(background.darkValue)
+      ? { kind, value: background.value, darkValue: background.darkValue }
+      : { kind, value: background.value },
     title: isText(title) ? title : undefined,
     items: Array.isArray(items) ? items : [],
   };
+}
+
+/** All seven colours, or null if any is missing. */
+function parseColors(source: Json): ThemeColors | null {
+  const colors = {} as ThemeColors;
+  for (const key of COLOR_KEYS) {
+    const color = source[key];
+    if (!isText(color)) return null;
+    colors[key] = color;
+  }
+  return colors;
 }
 
 /**
@@ -72,12 +85,10 @@ export function validateConfig(input: unknown): LayoutConfig {
 
   const theme = input.theme;
   if (!isRecord(theme)) throw new Error('Config theme missing');
-  const colors = {} as ThemeColors;
-  for (const key of COLOR_KEYS) {
-    const color = theme[key];
-    if (!isText(color)) throw new Error(`Config theme.${key} missing`);
-    colors[key] = color;
-  }
+  const colors = parseColors(theme);
+  if (!colors) throw new Error('Config theme colours missing');
+  // An incomplete dark palette is ignored: the app then stays light rather than half-themed.
+  const dark = isRecord(theme.dark) ? parseColors(theme.dark) : null;
 
   const festival = theme.festival;
   const hasFestival =
@@ -97,16 +108,19 @@ export function validateConfig(input: unknown): LayoutConfig {
 
   return {
     version: input.version,
-    theme: hasFestival
-      ? {
-          ...colors,
-          festival: {
-            name: festival.name as string,
-            greeting: festival.greeting as string,
-            bannerImageUrl: festival.bannerImageUrl as string,
-          },
-        }
-      : colors,
+    theme: {
+      ...colors,
+      ...(hasFestival
+        ? {
+            festival: {
+              name: festival.name as string,
+              greeting: festival.greeting as string,
+              bannerImageUrl: festival.bannerImageUrl as string,
+            },
+          }
+        : null),
+      ...(dark ? { dark } : null),
+    },
     tabs,
     sections,
   };

@@ -43,6 +43,15 @@ export const FALLBACK_CONFIG: LayoutConfig = {
     textPrimary: '#10231F',
     textSecondary: '#4B635E',
     accent: '#B45309',
+    dark: {
+      primary: '#5EEAD4',
+      secondary: '#99F6E4',
+      background: '#0B1614',
+      surface: '#14231F',
+      textPrimary: '#E8F3F0',
+      textSecondary: '#A3B8B3',
+      accent: '#FBBF24',
+    },
   },
   tabs: [
     { id: 'home', label: 'Home', icon: 'home', screen: 'home' },

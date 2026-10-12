@@ -75,6 +75,10 @@ export const hi: Translations = {
     emptyMessage: 'आपके डॉक्टर के पर्चे यहाँ दिखेंगे।',
   },
   profile: {
+    appearance: 'रूप',
+    appearanceSystem: 'सिस्टम',
+    appearanceLight: 'लाइट',
+    appearanceDark: 'डार्क',
     title: 'प्रोफ़ाइल',
     language: 'भाषा',
     demoControls: 'मॉक सर्वर के डेमो कंट्रोल',

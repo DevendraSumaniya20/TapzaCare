@@ -74,6 +74,10 @@ export const te: Translations = {
     emptyMessage: 'మీ డాక్టర్ ఇచ్చిన ప్రిస్క్రిప్షన్లు ఇక్కడ కనిపిస్తాయి.',
   },
   profile: {
+    appearance: 'రూపం',
+    appearanceSystem: 'సిస్టమ్',
+    appearanceLight: 'లైట్',
+    appearanceDark: 'డార్క్',
     title: 'ప్రొఫైల్',
     language: 'భాష',
     demoControls: 'మాక్ సర్వర్ డెమో నియంత్రణలు',

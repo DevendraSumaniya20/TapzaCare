@@ -75,13 +75,26 @@ export const normalConfig: LayoutConfig = {
     textPrimary: '#10231F',
     textSecondary: '#4B635E',
     accent: '#B45309',
+    dark: {
+      primary: '#5EEAD4',
+      secondary: '#99F6E4',
+      background: '#0B1614',
+      surface: '#14231F',
+      textPrimary: '#E8F3F0',
+      textSecondary: '#A3B8B3',
+      accent: '#FBBF24',
+    },
   },
   tabs,
   sections: [
     {
       id: 'hero',
       type: 'hero_banner',
-      background: { kind: 'gradient', value: '#0F766E,#134E4A' },
+      background: {
+        kind: 'gradient',
+        value: '#0F766E,#134E4A',
+        darkValue: '#134E4A,#0B1614',
+      },
       items: [
         {
           greeting: 'Namaste, Ramesh garu',
@@ -92,26 +105,26 @@ export const normalConfig: LayoutConfig = {
     {
       id: 'categories',
       type: 'category_chips',
-      background: { kind: 'color', value: '#FFFFFF' },
+      background: { kind: 'color', value: '#FFFFFF', darkValue: '#14231F' },
       items: categories,
     },
     {
       id: 'quick',
       type: 'quick_actions',
-      background: { kind: 'color', value: '#E6F2F0' },
+      background: { kind: 'color', value: '#E6F2F0', darkValue: '#0F1F1C' },
       title: 'Quick actions',
       items: quickActions,
     },
     {
       id: 'offer',
       type: 'offer_strip',
-      background: { kind: 'color', value: '#FEF3C7' },
+      background: { kind: 'color', value: '#FEF3C7', darkValue: '#3A2A0A' },
       items: [{ message: 'Free home sample pickup on lab tests above ₹499' }],
     },
     {
       id: 'doctors',
       type: 'doctor_carousel',
-      background: { kind: 'color', value: '#FFFFFF' },
+      background: { kind: 'color', value: '#FFFFFF', darkValue: '#14231F' },
       title: 'Doctors at Sri Sai Clinic',
       items: doctorCards,
     },
@@ -119,13 +132,17 @@ export const normalConfig: LayoutConfig = {
     {
       id: 'future',
       type: 'video_story',
-      background: { kind: 'color', value: '#FFFFFF' },
+      background: { kind: 'color', value: '#FFFFFF', darkValue: '#14231F' },
       items: [],
     },
     {
       id: 'services',
       type: 'service_grid',
-      background: { kind: 'gradient', value: '#F4F8F7,#DCEDEA' },
+      background: {
+        kind: 'gradient',
+        value: '#F4F8F7,#DCEDEA',
+        darkValue: '#0B1614,#12241F',
+      },
       title: 'Popular services',
       items: [
         {
@@ -169,6 +186,15 @@ export const festivalConfig: LayoutConfig = {
     textPrimary: '#2A1608',
     textSecondary: '#6B4A33',
     accent: '#B45309',
+    dark: {
+      primary: '#FDBA74',
+      secondary: '#FED7AA',
+      background: '#1A0F07',
+      surface: '#26170C',
+      textPrimary: '#FCEBDD',
+      textSecondary: '#D6B8A1',
+      accent: '#FBBF24',
+    },
     festival: {
       name: 'Diwali',
       greeting: 'Happy Diwali, Ramesh garu',
@@ -194,7 +220,11 @@ export const festivalConfig: LayoutConfig = {
     {
       id: 'offer',
       type: 'offer_strip',
-      background: { kind: 'gradient', value: '#FDE68A,#FDBA74' },
+      background: {
+        kind: 'gradient',
+        value: '#FDE68A,#FDBA74',
+        darkValue: '#4A2A08,#5A2E0A',
+      },
       items: [
         { message: 'Diwali offer: 25% off family health checkups till 25 Oct' },
       ],
@@ -202,7 +232,7 @@ export const festivalConfig: LayoutConfig = {
     {
       id: 'services',
       type: 'service_grid',
-      background: { kind: 'color', value: '#FFEDD5' },
+      background: { kind: 'color', value: '#FFEDD5', darkValue: '#2A1608' },
       title: 'Festival health packages',
       items: [
         {
@@ -230,21 +260,25 @@ export const festivalConfig: LayoutConfig = {
     {
       id: 'quick',
       type: 'quick_actions',
-      background: { kind: 'color', value: '#FFFFFF' },
+      background: { kind: 'color', value: '#FFFFFF', darkValue: '#26170C' },
       title: 'Quick actions',
       items: quickActions,
     },
     {
       id: 'doctors',
       type: 'doctor_carousel',
-      background: { kind: 'gradient', value: '#FFF8EE,#FFEDD5' },
+      background: {
+        kind: 'gradient',
+        value: '#FFF8EE,#FFEDD5',
+        darkValue: '#1A0F07,#26170C',
+      },
       title: 'Available this festival week',
       items: doctorCards.slice(0, 3),
     },
     {
       id: 'categories',
       type: 'category_chips',
-      background: { kind: 'color', value: '#FFFFFF' },
+      background: { kind: 'color', value: '#FFFFFF', darkValue: '#26170C' },
       items: categories,
     },
   ],
