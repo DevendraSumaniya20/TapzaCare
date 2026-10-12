@@ -5,7 +5,11 @@ import {
   createBottomTabNavigator,
   type BottomTabBarProps,
 } from '@react-navigation/bottom-tabs';
-import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
+import {
+  DefaultTheme,
+  NavigationContainer,
+  type LinkingOptions,
+} from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { OfflineBanner } from '../components/OfflineBanner';
@@ -48,6 +52,19 @@ const renderTabIcon = (name: string) => {
   );
 };
 
+// tapzacare://doctor/doc_2 opens booking for that doctor; tapzacare://prescription/rx_1 opens that schedule.
+// Tabs is always placed underneath, so Back from a deep-linked screen lands on Home instead of closing the app.
+const linking: LinkingOptions<RootStackParamList> = {
+  prefixes: ['tapzacare://'],
+  config: {
+    initialRouteName: 'Tabs',
+    screens: {
+      Booking: 'doctor/:doctorId',
+      PrescriptionDetail: 'prescription/:prescriptionId',
+    },
+  },
+};
+
 /** The bottom tabs, built from the remote config. */
 function Tabs() {
   const { config } = useConfig();
@@ -83,6 +100,7 @@ export function RootNavigator() {
 
   return (
     <NavigationContainer
+      linking={linking}
       theme={{
         ...DefaultTheme,
         dark: isDark,

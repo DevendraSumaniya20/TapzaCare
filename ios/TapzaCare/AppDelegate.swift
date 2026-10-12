@@ -42,11 +42,23 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     self.window = window
     appDelegate.window = window
 
+    // A deep link that launched the app arrives here, not in the app delegate's launch options.
+    var launchOptions: [AnyHashable: Any]?
+    if let url = connectionOptions.urlContexts.first?.url {
+      launchOptions = [UIApplication.LaunchOptionsKey.url: url]
+    }
+
     appDelegate.reactNativeFactory?.startReactNative(
       withModuleName: "TapzaCare",
       in: window,
-      launchOptions: nil
+      launchOptions: launchOptions
     )
+  }
+
+  // A deep link opened while the app is already running.
+  func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+    guard let url = URLContexts.first?.url else { return }
+    RCTLinkingManager.application(UIApplication.shared, open: url, options: [:])
   }
 }
 

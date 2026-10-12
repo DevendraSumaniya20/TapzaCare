@@ -8,10 +8,12 @@ import {
   type LucideIcon,
 } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
+import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '../components/AppText';
 import { DoseRow } from '../components/prescriptions/DoseRow';
 import { StateView } from '../components/StateView';
+import { usePulse } from '../hooks/usePulse';
 import { useTheme } from '../hooks/useTheme';
 import type { RootStackParamList } from '../navigation/types';
 import { useGetPrescriptionsQuery } from '../services/api';
@@ -44,11 +46,42 @@ export function PrescriptionDetailScreen({ route }: Props) {
   const dispatch = useAppDispatch();
   const language = useAppSelector(state => state.settings.language);
   const taken = useAppSelector(state => state.doses);
+  const pulse = usePulse();
   // Same cache entry the list screen loaded, so this opens with no second request.
-  const { data: prescriptions } = useGetPrescriptionsQuery(language);
+  // Opened by deep link, nothing is cached yet and it loads here.
+  const { data: prescriptions, isLoading } = useGetPrescriptionsQuery(language);
   const prescription = prescriptions?.find(
     candidate => candidate.id === route.params.prescriptionId,
   );
+
+  if (isLoading) {
+    return (
+      <Animated.View
+        accessibilityRole="progressbar"
+        style={[
+          pulse,
+          {
+            padding: spacing.lg,
+            gap: spacing.lg,
+            backgroundColor: colors.background,
+          },
+        ]}
+      >
+        {[0, 1, 2].map(key => (
+          <View
+            key={key}
+            style={[
+              styles.skeleton,
+              {
+                borderRadius: radius.md,
+                backgroundColor: withAlpha(colors.textSecondary, 0.16),
+              },
+            ]}
+          />
+        ))}
+      </Animated.View>
+    );
+  }
 
   if (!prescription) {
     return (
@@ -179,6 +212,7 @@ export function PrescriptionDetailScreen({ route }: Props) {
 }
 
 const styles = StyleSheet.create({
+  skeleton: { height: 150 },
   track: { height: 8, overflow: 'hidden' },
   fill: { height: '100%' },
   card: { borderWidth: StyleSheet.hairlineWidth },
