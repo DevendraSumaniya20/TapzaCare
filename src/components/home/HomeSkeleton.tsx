@@ -1,13 +1,8 @@
-import { useEffect } from 'react';
 import { StyleSheet, View, type DimensionValue } from 'react-native';
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withRepeat,
-  withTiming,
-} from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { scale } from 'react-native-size-matters';
+import { usePulse } from '../../hooks/usePulse';
 import { useTheme } from '../../hooks/useTheme';
 import { withAlpha } from '../../utils/color';
 
@@ -39,12 +34,7 @@ function Block({
 export function HomeSkeleton() {
   const { colors, spacing, radius } = useTheme();
   const insets = useSafeAreaInsets();
-  const pulse = useSharedValue(1);
-
-  useEffect(() => {
-    pulse.value = withRepeat(withTiming(0.45, { duration: 700 }), -1, true);
-  }, [pulse]);
-  const pulseStyle = useAnimatedStyle(() => ({ opacity: pulse.value }));
+  const pulseStyle = usePulse();
 
   const block = withAlpha(colors.textSecondary, 0.16);
 

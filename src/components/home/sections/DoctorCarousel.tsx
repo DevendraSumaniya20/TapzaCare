@@ -1,7 +1,7 @@
 import { FlatList, Pressable, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { scale } from 'react-native-size-matters';
-import { useGoToTab } from '../../../hooks/useGoToTab';
+import { useOpenBooking } from '../../../hooks/useGoToTab';
 import { useTheme } from '../../../hooks/useTheme';
 import { withAlpha } from '../../../utils/color';
 import { haptics } from '../../../utils/haptics';
@@ -18,7 +18,7 @@ const PHOTO = scale(64);
 export function DoctorCarousel({ section, topInset }: SectionProps) {
   const { t } = useTranslation();
   const { colors, spacing, radius } = useTheme();
-  const goToTab = useGoToTab();
+  const openBooking = useOpenBooking();
   const doctors = parseItems(section.items, item =>
     isText(item.id) && isText(item.name) && isText(item.specialty)
       ? {
@@ -51,7 +51,7 @@ export function DoctorCarousel({ section, topInset }: SectionProps) {
             accessibilityLabel={`${item.name}, ${item.specialty}`}
             onPress={() => {
               haptics.tap();
-              goToTab('bookings');
+              openBooking(item.id);
             }}
             style={({ pressed }) => [
               styles.card,

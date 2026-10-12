@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 import { scale } from 'react-native-size-matters';
 import { getIcon } from '../../../constants/icons';
-import { useGoToTab } from '../../../hooks/useGoToTab';
+import { useGoToTab, useOpenBooking } from '../../../hooks/useGoToTab';
 import { useTheme } from '../../../hooks/useTheme';
 import type { TabScreen } from '../../../types/api';
 import { withAlpha } from '../../../utils/color';
@@ -12,9 +12,9 @@ import { useSectionTextColor } from '../SectionBackground';
 import type { SectionProps } from '../SectionRenderer';
 import { SectionShell } from '../SectionShell';
 
-// Where each action leads today. Reminders and Family have no screen of their own yet.
+// Where each action leads today. "book" opens the booking flow instead of a tab.
+// Reminders and Family have no screen of their own yet.
 const TARGET_SCREEN: Record<string, TabScreen> = {
-  book: 'bookings',
   prescriptions: 'prescriptions',
   reminders: 'prescriptions',
   family: 'profile',
@@ -27,6 +27,7 @@ export function QuickActions({ section, topInset }: SectionProps) {
   const { colors, spacing, radius } = useTheme();
   const textColor = useSectionTextColor(section.background);
   const goToTab = useGoToTab();
+  const openBooking = useOpenBooking();
   const actions = parseItems(section.items, item =>
     isText(item.id) && isText(item.label)
       ? {
@@ -54,7 +55,8 @@ export function QuickActions({ section, topInset }: SectionProps) {
               accessibilityLabel={action.label}
               onPress={() => {
                 haptics.tap();
-                if (screen) goToTab(screen);
+                if (action.target === 'book') openBooking();
+                else if (screen) goToTab(screen);
               }}
               style={({ pressed }) => [
                 styles.tile,

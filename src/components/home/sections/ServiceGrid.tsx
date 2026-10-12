@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, View } from 'react-native';
-import { useGoToTab } from '../../../hooks/useGoToTab';
+import { useOpenBooking } from '../../../hooks/useGoToTab';
 import { useTheme } from '../../../hooks/useTheme';
 import { formatInr } from '../../../utils/format';
 import { haptics } from '../../../utils/haptics';
@@ -12,7 +12,7 @@ import { SectionShell } from '../SectionShell';
 /** service_grid: two-column cards with image, name, price in rupees and an optional badge. */
 export function ServiceGrid({ section, topInset }: SectionProps) {
   const { colors, spacing, radius } = useTheme();
-  const goToTab = useGoToTab();
+  const openBooking = useOpenBooking();
   const services = parseItems(section.items, item =>
     isText(item.id) && isText(item.name) && typeof item.priceInr === 'number'
       ? {
@@ -43,7 +43,7 @@ export function ServiceGrid({ section, topInset }: SectionProps) {
             )}`}
             onPress={() => {
               haptics.tap();
-              goToTab('bookings');
+              openBooking();
             }}
             style={({ pressed }) => [
               styles.card,
