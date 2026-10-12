@@ -1,6 +1,8 @@
 import { resetMockServer } from '../src/services/mockServer';
 import { store } from '../src/store';
 import reducer, {
+  bookingsLoaded,
+  syncQueuedBookings,
   bookingConfirmed,
   bookingFailed,
   bookingStarted,
@@ -16,6 +18,7 @@ const pending: LocalBooking = {
   doctorId: 'doc_1',
   doctorName: 'Dr. Lakshmi Reddy',
   slotId: 'slot_1',
+  date: '2026-10-12',
   startsAt: '2026-10-12T04:00:00.000Z',
   status: 'pending',
 };
@@ -50,6 +53,13 @@ describe('bookings reducer', () => {
     expect(
       reducer([pending], bookingFailed({ localId: 'nope', failure: 'other' })),
     ).toEqual([pending]);
+  });
+});
+
+describe('bookings restored from storage', () => {
+  it('puts a booking that was mid-request back in the queue', () => {
+    const [booking] = reducer([], bookingsLoaded([pending]));
+    expect(booking.status).toBe('queued');
   });
 });
 
@@ -121,5 +131,20 @@ describe('bookSlot (optimistic flow against the mock)', () => {
       status: 'failed',
       failure: 'slotTaken',
     });
+  });
+
+  it('queues a booking made offline and sends it when the connection returns', async () => {
+    const slot = await freeSlot();
+    store.dispatch(api.internalActions.onOffline());
+    const localId = store.dispatch(bookSlot(doctor, slot, date));
+    expect(find(localId)?.status).toBe('queued');
+
+    // Still offline: syncing does nothing.
+    store.dispatch(syncQueuedBookings());
+    expect(find(localId)?.status).toBe('queued');
+
+    store.dispatch(api.internalActions.onOnline());
+    store.dispatch(syncQueuedBookings());
+    expect(await settled(localId)).toMatchObject({ status: 'confirmed' });
   });
 });

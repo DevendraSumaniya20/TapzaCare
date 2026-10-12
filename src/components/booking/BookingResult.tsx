@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { X } from 'lucide-react-native';
+import { CloudOff, X } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import Animated, { FadeInDown, ZoomIn } from 'react-native-reanimated';
 import { scale } from 'react-native-size-matters';
@@ -30,13 +30,20 @@ export function BookingResult({ booking, onChooseAnother, onDone }: Props) {
   const { colors, spacing, radius } = useTheme();
   const language = useAppSelector(state => state.settings.language);
   const failed = booking.status === 'failed';
+  // Made offline: saved on the device, not yet sent.
+  const queued = booking.status === 'queued';
 
   useEffect(() => {
     if (failed) haptics.error();
     else haptics.success();
-  }, [failed]);
+  }, [failed, queued]);
+
+  let title = t('booking.successTitle');
+  if (queued) title = t('booking.queuedTitle');
+  if (failed) title = t('booking.failedTitle');
 
   let status = t('booking.confirming');
+  if (queued) status = t('booking.queuedMessage');
   if (booking.status === 'confirmed') status = t('booking.confirmed');
   if (failed)
     status = t(
@@ -53,19 +60,24 @@ export function BookingResult({ booking, onChooseAnother, onDone }: Props) {
         { padding: spacing.xl, backgroundColor: colors.background },
       ]}
     >
-      {failed ? (
+      {failed || queued ? (
         <Animated.View
+          key={`badge-${booking.status}`}
           entering={ZoomIn.springify()}
           style={[
             styles.failBadge,
             {
               marginBottom: spacing.xl,
               borderRadius: radius.pill,
-              backgroundColor: colors.textSecondary,
+              backgroundColor: queued ? colors.accent : colors.textSecondary,
             },
           ]}
         >
-          <X color={colors.surface} size={FAIL_BADGE * 0.5} strokeWidth={3} />
+          {queued ? (
+            <CloudOff color={colors.surface} size={FAIL_BADGE * 0.5} />
+          ) : (
+            <X color={colors.surface} size={FAIL_BADGE * 0.5} strokeWidth={3} />
+          )}
         </Animated.View>
       ) : (
         <SuccessBadge />
@@ -73,12 +85,12 @@ export function BookingResult({ booking, onChooseAnother, onDone }: Props) {
 
       {/* Keyed so the text and button animate in again if success flips to failure. */}
       <Animated.View
-        key={failed ? 'failed' : 'ok'}
+        key={`text-${failed ? 'failed' : queued ? 'queued' : 'ok'}`}
         entering={FadeInDown.delay(failed ? 100 : 350).duration(400)}
         style={[styles.text, { gap: spacing.sm }]}
       >
         <AppText variant="title" bold style={styles.centered}>
-          {t(failed ? 'booking.failedTitle' : 'booking.successTitle')}
+          {title}
         </AppText>
         <AppText variant="subtitle" style={styles.centered}>
           {booking.doctorName}

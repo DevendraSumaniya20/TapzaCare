@@ -52,6 +52,9 @@ const mockBaseQuery: BaseQueryFn<MockRequest, unknown, ApiError> = async (
   return { data };
 };
 
+// Doctors and slots seen recently stay cached this long, so a booking can be started while offline.
+const OFFLINE_CACHE_SECONDS = 60 * 60;
+
 export const api = createApi({
   reducerPath: 'api',
   baseQuery: mockBaseQuery,
@@ -84,9 +87,11 @@ export const api = createApi({
     }),
     getDoctors: build.query<Doctor[], void>({
       query: () => ({ method: 'GET', path: '/doctors' }),
+      keepUnusedDataFor: OFFLINE_CACHE_SECONDS,
     }),
     getSlots: build.query<Slot[], { doctorId: string; date: string }>({
       query: params => ({ method: 'GET', path: '/slots', params }),
+      keepUnusedDataFor: OFFLINE_CACHE_SECONDS,
       providesTags: ['Slots'],
     }),
     // `date` is not sent; it identifies which cached slot list to update.

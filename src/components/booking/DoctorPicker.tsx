@@ -56,7 +56,8 @@ export function DoctorPicker({ selectedId, onSelect }: Props) {
     );
   }
 
-  if (isError || !doctors || doctors.length === 0) {
+  // A failed refetch still leaves the last good list in `doctors`; only show the error with nothing to show.
+  if (!doctors || doctors.length === 0) {
     return (
       <View style={styles.state}>
         <StateView

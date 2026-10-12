@@ -136,7 +136,7 @@ export function SlotSheet({ sheetRef, doctorId, date, onConfirm }: Props) {
         ))}
       </Animated.View>
     );
-  } else if (isError) {
+  } else if (isError && !slots) {
     body = (
       <StateView
         icon={CloudOff}

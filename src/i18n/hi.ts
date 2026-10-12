@@ -27,6 +27,9 @@ export const hi: Translations = {
     emptyMessage: 'आपकी बुक की हुई अपॉइंटमेंट यहाँ दिखेंगी।',
   },
   booking: {
+    queuedTitle: 'सहेज लिया। आप ऑफ़लाइन हैं',
+    queuedMessage: 'ऑनलाइन होते ही हम क्लिनिक में यह बुकिंग कर देंगे।',
+    statusQueued: 'इंटरनेट का इंतज़ार',
     title: 'अपॉइंटमेंट बुक करें',
     chooseDoctor: 'डॉक्टर चुनें',
     chooseDate: 'तारीख़ चुनें',

@@ -1,11 +1,17 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { api, type ApiError } from '../services/api';
 import type { Doctor, Slot } from '../types/api';
 import type { AppThunk } from './index';
 
+export const BOOKINGS_STORAGE_KEY = 'tapza.bookings';
+
 /**
  * A booking as this device knows it. The brief has no GET /bookings, so the list lives on the client.
- * It is created as 'pending' the moment the user confirms, then reconciled with the server's answer.
+ *
+ * Life of a booking:
+ *   online:  pending  -> confirmed | failed
+ *   offline: queued   -> (connection returns) -> pending -> confirmed | failed
  */
 export type LocalBooking = {
   // Made on the device so the UI can follow one booking from tap to final answer.
@@ -15,8 +21,10 @@ export type LocalBooking = {
   doctorId: string;
   doctorName: string;
   slotId: string;
+  // YYYY-MM-DD of the slot; needed to update the cached slot list when the booking is sent.
+  date: string;
   startsAt: string;
-  status: 'pending' | 'confirmed' | 'failed';
+  status: 'queued' | 'pending' | 'confirmed' | 'failed';
   failure?: 'slotTaken' | 'other';
 };
 
@@ -26,6 +34,13 @@ const bookingsSlice = createSlice({
   reducers: {
     bookingStarted: (state, action: PayloadAction<LocalBooking>) => {
       state.unshift(action.payload);
+    },
+    // A queued booking is now being sent.
+    bookingSubmitted: (state, action: PayloadAction<string>) => {
+      const booking = state.find(
+        candidate => candidate.localId === action.payload,
+      );
+      if (booking) booking.status = 'pending';
     },
     bookingConfirmed: (
       state,
@@ -52,42 +67,36 @@ const bookingsSlice = createSlice({
       booking.status = 'failed';
       booking.failure = action.payload.failure;
     },
+    // Restored from storage. A booking that was mid-request when the app closed has an unknown
+    // outcome, so it goes back in the queue to be sent again.
+    bookingsLoaded: (_state, action: PayloadAction<LocalBooking[]>) =>
+      action.payload.map(booking =>
+        booking.status === 'pending'
+          ? { ...booking, status: 'queued' }
+          : booking,
+      ),
   },
 });
 
-export const { bookingStarted, bookingConfirmed, bookingFailed } =
-  bookingsSlice.actions;
+export const {
+  bookingStarted,
+  bookingSubmitted,
+  bookingConfirmed,
+  bookingFailed,
+  bookingsLoaded,
+} = bookingsSlice.actions;
 export default bookingsSlice.reducer;
 
-/**
- * Optimistic booking: records it as pending and returns at once, so the success screen can show
- * without waiting. The POST runs in the background and settles the booking either way.
- */
-export const bookSlot =
-  (doctor: Doctor, slot: Slot, date: string): AppThunk<string> =>
+/** Sends one booking to the server and records the answer. */
+const submitBooking =
+  (booking: LocalBooking): AppThunk =>
   dispatch => {
-    const localId = `local_${slot.id}_${Date.now()}`;
-    dispatch(
-      bookingStarted({
-        localId,
-        doctorId: doctor.id,
-        doctorName: doctor.name,
-        slotId: slot.id,
-        startsAt: slot.startsAt,
-        status: 'pending',
-      }),
-    );
-
-    dispatch(
-      api.endpoints.createBooking.initiate({
-        doctorId: doctor.id,
-        slotId: slot.id,
-        date,
-      }),
-    )
+    const { localId, doctorId, slotId, date } = booking;
+    dispatch(bookingSubmitted(localId));
+    dispatch(api.endpoints.createBooking.initiate({ doctorId, slotId, date }))
       .unwrap()
-      .then(booking =>
-        dispatch(bookingConfirmed({ localId, serverId: booking.id })),
+      .then(result =>
+        dispatch(bookingConfirmed({ localId, serverId: result.id })),
       )
       .catch((error: ApiError) =>
         dispatch(
@@ -97,6 +106,48 @@ export const bookSlot =
           }),
         ),
       );
-
-    return localId;
   };
+
+/**
+ * Optimistic booking: records it and returns at once, so the result screen can show without waiting.
+ * Online, the POST runs in the background and settles the booking either way.
+ * Offline, the booking waits in the queue until syncQueuedBookings runs.
+ */
+export const bookSlot =
+  (doctor: Doctor, slot: Slot, date: string): AppThunk<string> =>
+  (dispatch, getState) => {
+    const online = getState().api.config.online;
+    const booking: LocalBooking = {
+      localId: `local_${slot.id}_${Date.now()}`,
+      doctorId: doctor.id,
+      doctorName: doctor.name,
+      slotId: slot.id,
+      date,
+      startsAt: slot.startsAt,
+      status: online ? 'pending' : 'queued',
+    };
+    dispatch(bookingStarted(booking));
+    if (online) dispatch(submitBooking(booking));
+    return booking.localId;
+  };
+
+/** Sends every queued booking. Called when the connection returns and after bookings load at startup. */
+export const syncQueuedBookings = (): AppThunk => (dispatch, getState) => {
+  if (!getState().api.config.online) return;
+  getState()
+    .bookings.filter(booking => booking.status === 'queued')
+    .forEach(booking => dispatch(submitBooking(booking)));
+};
+
+/** Restores bookings saved by an earlier run, then sends any that were waiting. */
+export const loadBookings = (): AppThunk => async dispatch => {
+  try {
+    const saved: unknown = JSON.parse(
+      (await AsyncStorage.getItem(BOOKINGS_STORAGE_KEY)) ?? '[]',
+    );
+    if (Array.isArray(saved)) dispatch(bookingsLoaded(saved as LocalBooking[]));
+  } catch {
+    // Unreadable storage only means starting with an empty list.
+  }
+  dispatch(syncQueuedBookings());
+};

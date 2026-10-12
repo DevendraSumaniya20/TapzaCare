@@ -26,6 +26,10 @@ export const en = {
     emptyMessage: 'Appointments you book will appear here.',
   },
   booking: {
+    queuedTitle: 'Saved. You are offline',
+    queuedMessage:
+      'We will book this with the clinic as soon as you are back online.',
+    statusQueued: 'Waiting for internet',
     title: 'Book appointment',
     chooseDoctor: 'Choose a doctor',
     chooseDate: 'Choose a date',

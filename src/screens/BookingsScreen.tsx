@@ -12,6 +12,7 @@ import { withAlpha } from '../utils/color';
 import { formatDay, formatTime } from '../utils/date';
 
 const STATUS_KEY = {
+  queued: 'booking.statusQueued',
   pending: 'booking.statusPending',
   confirmed: 'booking.statusConfirmed',
   failed: 'booking.statusFailed',
