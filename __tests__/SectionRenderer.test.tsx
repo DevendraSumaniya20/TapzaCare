@@ -1,37 +1,29 @@
-import { NavigationContainer } from '@react-navigation/native';
-import { render, screen } from '@testing-library/react-native';
-import { Provider } from 'react-redux';
+import { fireEvent, screen } from '@testing-library/react-native';
 import { SectionRenderer } from '../src/components/home/SectionRenderer';
-import '../src/i18n';
-import { api } from '../src/services/api';
-import { store } from '../src/store';
-import { setLatency } from '../src/store/settingsSlice';
 import type { SectionConfig } from '../src/types/api';
+import {
+  cleanUpStore,
+  prepareStore,
+  renderWithProviders,
+} from '../testUtils/renderWithProviders';
 
-const section = (type: string, items: unknown[]): SectionConfig => ({
+const section = (
+  type: string,
+  items: unknown[],
+  title?: string,
+): SectionConfig => ({
   id: 'test',
   type,
+  title,
   background: { kind: 'color', value: '#FFFFFF' },
   items,
 });
 
 const renderSection = (config: SectionConfig) =>
-  render(
-    <Provider store={store}>
-      <NavigationContainer>
-        <SectionRenderer section={config} />
-      </NavigationContainer>
-    </Provider>,
-  );
+  renderWithProviders(<SectionRenderer section={config} />);
 
-beforeAll(() => {
-  store.dispatch(setLatency(0));
-});
-
-// Drops RTK Query's cache timers so Jest can exit.
-afterAll(() => {
-  store.dispatch(api.util.resetApiState());
-});
+beforeAll(prepareStore);
+afterAll(cleanUpStore);
 
 describe('SectionRenderer', () => {
   it('renders an offer strip message', async () => {
@@ -68,5 +60,66 @@ describe('SectionRenderer', () => {
     );
     expect(screen.getByText('₹1,499')).toBeTruthy();
     expect(screen.queryByText('No price')).toBeNull();
+  });
+
+  it('renders the section title, and each remaining section type from its items', async () => {
+    await renderSection(
+      section(
+        'doctor_carousel',
+        [
+          {
+            id: 'd1',
+            name: 'Dr. Lakshmi Reddy',
+            specialty: 'General Physician',
+            nextAvailable: 'Today, 5:30 PM',
+          },
+        ],
+        'Our doctors',
+      ),
+    );
+    expect(screen.getByRole('header', { name: 'Our doctors' })).toBeTruthy();
+    expect(screen.getByText('Dr. Lakshmi Reddy')).toBeTruthy();
+    expect(screen.getByText('Today, 5:30 PM')).toBeTruthy();
+  });
+
+  it('shows the hero greeting and subtitle', async () => {
+    await renderSection(
+      section('hero_banner', [
+        { greeting: 'Namaste, Ramesh garu', subtitle: 'How are you today?' },
+      ]),
+    );
+    expect(screen.getByText('Namaste, Ramesh garu')).toBeTruthy();
+    expect(screen.getByText('How are you today?')).toBeTruthy();
+  });
+
+  it('renders quick actions as buttons', async () => {
+    await renderSection(
+      section('quick_actions', [
+        { id: 'book', label: 'Book', icon: 'calendar', target: 'book' },
+      ]),
+    );
+    expect(screen.getByRole('button', { name: 'Book' })).toBeTruthy();
+  });
+
+  it('selects a category chip when it is pressed', async () => {
+    await renderSection(
+      section('category_chips', [
+        { id: 'consult', label: 'Consult', icon: 'stethoscope' },
+        { id: 'lab', label: 'Lab tests', icon: 'lab' },
+      ]),
+    );
+    const [consult, lab] = screen.getAllByRole('tab');
+    expect(consult).toBeSelected();
+
+    await fireEvent.press(lab);
+    expect(screen.getAllByRole('tab')[1]).toBeSelected();
+    expect(screen.getAllByRole('tab')[0]).not.toBeSelected();
+  });
+
+  it('renders nothing for a known section whose items are all invalid', async () => {
+    await renderSection(
+      section('doctor_carousel', [{ id: 'd1' }, null], 'Our doctors'),
+    );
+    expect(screen.queryByText('Our doctors')).toBeNull();
   });
 });
