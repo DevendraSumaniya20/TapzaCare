@@ -14,6 +14,7 @@ import { useTheme } from '../hooks/useTheme';
 import { BookingScreen } from '../screens/BookingScreen';
 import { BookingsScreen } from '../screens/BookingsScreen';
 import { HomeScreen } from '../screens/HomeScreen';
+import { PrescriptionDetailScreen } from '../screens/PrescriptionDetailScreen';
 import { PrescriptionsScreen } from '../screens/PrescriptionsScreen';
 import { ProfileScreen } from '../screens/ProfileScreen';
 import type { TabScreen } from '../types/api';
@@ -103,6 +104,14 @@ export function RootNavigator() {
           component={BookingScreen}
           options={{
             title: t('booking.title'),
+            headerBackButtonDisplayMode: 'minimal',
+          }}
+        />
+        <Stack.Screen
+          name="PrescriptionDetail"
+          component={PrescriptionDetailScreen}
+          options={{
+            title: t('prescriptions.detailTitle'),
             headerBackButtonDisplayMode: 'minimal',
           }}
         />

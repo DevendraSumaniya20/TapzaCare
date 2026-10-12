@@ -134,7 +134,7 @@ export async function mockRequest(
     case '/bookings':
       return createBooking(request.body);
     case '/prescriptions':
-      return { status: 200, data: prescriptions };
+      return { status: 200, data: localize(prescriptions, settings.language) };
   }
 }
 

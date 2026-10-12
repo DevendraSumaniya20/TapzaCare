@@ -1,8 +1,14 @@
-// Stand-in for a backend that localises /config by Accept-Language.
+// Stand-in for a backend that localises /config and /prescriptions by Accept-Language.
 // Keyed by the English string; anything missing stays in English.
 type Dictionary = Record<string, string>;
 
 const hi: Dictionary = {
+  '1 tablet after food': 'खाने के बाद 1 गोली',
+  '1 tablet': '1 गोली',
+  '1 sachet in 1 litre water': '1 लीटर पानी में 1 पाउच',
+  '1 tablet before food': 'खाने से पहले 1 गोली',
+  'Sri Sai Clinic, Kukatpally, Hyderabad':
+    'श्री साई क्लिनिक, कुकटपल्ली, हैदराबाद',
   Home: 'होम',
   Bookings: 'बुकिंग',
   Prescriptions: 'पर्चे',
@@ -51,6 +57,12 @@ const hi: Dictionary = {
 };
 
 const te: Dictionary = {
+  '1 tablet after food': 'భోజనం తర్వాత 1 మాత్ర',
+  '1 tablet': '1 మాత్ర',
+  '1 sachet in 1 litre water': '1 లీటరు నీటిలో 1 సాచెట్',
+  '1 tablet before food': 'భోజనానికి ముందు 1 మాత్ర',
+  'Sri Sai Clinic, Kukatpally, Hyderabad':
+    'శ్రీ సాయి క్లినిక్, కూకట్‌పల్లి, హైదరాబాద్',
   Home: 'హోమ్',
   Bookings: 'బుకింగ్‌లు',
   Prescriptions: 'ప్రిస్క్రిప్షన్లు',

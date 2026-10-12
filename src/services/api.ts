@@ -119,7 +119,8 @@ export const api = createApi({
       // Reconcile: whatever happened, refetch slots so the list matches the server.
       invalidatesTags: ['Slots'],
     }),
-    getPrescriptions: build.query<Prescription[], void>({
+    // Keyed by language so switching language refetches the translated list.
+    getPrescriptions: build.query<Prescription[], Language>({
       query: () => ({ method: 'GET', path: '/prescriptions' }),
     }),
   }),
