@@ -49,6 +49,7 @@ const mockBaseQuery: BaseQueryFn<MockRequest, unknown, ApiError> = async (
 export const api = createApi({
   reducerPath: 'api',
   baseQuery: mockBaseQuery,
+  refetchOnReconnect: true,
   tagTypes: ['Slots'],
   endpoints: build => ({
     // The argument only keys the cache, so switching day or language refetches. The mock reads both itself.

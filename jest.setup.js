@@ -17,6 +17,10 @@ jest.mock('@react-native-async-storage/async-storage', () => {
   };
 });
 
+jest.mock('@react-native-community/netinfo', () =>
+  require('@react-native-community/netinfo/jest/netinfo-mock.js'),
+);
+
 jest.mock('react-native-haptic-feedback', () => ({ trigger: jest.fn() }));
 
 require('react-native-reanimated').setUpTests();

@@ -4,6 +4,11 @@ export const en = {
   common: {
     retry: 'Try again',
   },
+  offline: {
+    title: 'No internet connection',
+    message:
+      'Check your Wi-Fi or mobile data. This screen will close by itself when you are back online.',
+  },
   home: {
     yourClinic: 'Your clinic',
     clinicName: 'Sri Sai Clinic, Kukatpally',
