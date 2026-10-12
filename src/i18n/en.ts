@@ -5,9 +5,7 @@ export const en = {
     retry: 'Try again',
   },
   offline: {
-    title: 'No internet connection',
-    message:
-      'Check your Wi-Fi or mobile data. This screen will close by itself when you are back online.',
+    banner: 'You are offline. Showing saved content.',
   },
   home: {
     yourClinic: 'Your clinic',

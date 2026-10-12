@@ -1,6 +1,11 @@
 import type { ComponentType } from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import {
+  BottomTabBar,
+  createBottomTabNavigator,
+  type BottomTabBarProps,
+} from '@react-navigation/bottom-tabs';
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
+import { OfflineBanner } from '../components/OfflineBanner';
 import { getIcon } from '../constants/icons';
 import { useConfig } from '../hooks/useConfig';
 import { useTheme } from '../hooks/useTheme';
@@ -20,6 +25,14 @@ const SCREENS: Record<TabScreen, ComponentType> = {
 };
 
 const Tab = createBottomTabNavigator();
+
+// The banner is part of the tab bar's layout, so it pushes screen content up instead of covering it.
+const renderTabBar = (props: BottomTabBarProps) => (
+  <>
+    <OfflineBanner />
+    <BottomTabBar {...props} />
+  </>
+);
 
 const renderTabIcon = (name: string) => {
   const Icon = getIcon(name);
@@ -46,6 +59,7 @@ export function RootNavigator() {
       }}
     >
       <Tab.Navigator
+        tabBar={renderTabBar}
         screenListeners={{ tabPress: haptics.select }}
         screenOptions={{
           headerShown: false,

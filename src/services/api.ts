@@ -1,3 +1,4 @@
+import NetInfo from '@react-native-community/netinfo';
 import { createApi, type BaseQueryFn } from '@reduxjs/toolkit/query/react';
 import { FALLBACK_CONFIG } from '../constants/theme';
 import type { Language } from '../i18n';
@@ -30,6 +31,11 @@ const mockBaseQuery: BaseQueryFn<MockRequest, unknown, ApiError> = async (
   request,
   { getState },
 ) => {
+  // The mock lives in the app and would answer without a network. Fail like a real request would,
+  // so offline behaviour (cached config, error states) is the same as with a real backend.
+  if ((await NetInfo.fetch()).isConnected === false) {
+    return { error: { status: 0, message: 'No internet connection' } };
+  }
   const { status, data } = await mockRequest(
     request,
     (getState() as RootState).settings,
