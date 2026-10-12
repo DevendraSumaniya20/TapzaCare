@@ -1,0 +1,68 @@
+import {
+  mockRequest,
+  resetMockServer,
+  type MockSettings,
+} from '../src/services/mockServer';
+import type { Slot } from '../src/types/api';
+
+const settings: MockSettings = {
+  variant: 'normal',
+  latencyMs: 0,
+  failure: 'none',
+};
+// 2026-10-12 is a Monday, 2026-10-18 a Sunday.
+const slotsOn = async (date: string) =>
+  (
+    await mockRequest(
+      { method: 'GET', path: '/slots', params: { doctorId: 'doc_1', date } },
+      settings,
+    )
+  ).data as Slot[];
+
+beforeEach(resetMockServer);
+
+describe('mock server', () => {
+  it('serves a different config on the festival day', async () => {
+    const normal = await mockRequest(
+      { method: 'GET', path: '/config' },
+      settings,
+    );
+    const festival = await mockRequest(
+      { method: 'GET', path: '/config' },
+      { ...settings, variant: 'festival' },
+    );
+    expect(festival.data).not.toEqual(normal.data);
+  });
+
+  it('fails only the endpoints the failure switch names', async () => {
+    const failing: MockSettings = { ...settings, failure: 'config' };
+    expect(
+      (await mockRequest({ method: 'GET', path: '/config' }, failing)).status,
+    ).toBe(500);
+    expect(
+      (await mockRequest({ method: 'GET', path: '/doctors' }, failing)).status,
+    ).toBe(200);
+  });
+
+  it('has no slots on a Sunday', async () => {
+    expect(await slotsOn('2026-10-18')).toEqual([]);
+  });
+
+  it('books a free slot once, then answers 409', async () => {
+    const free = (await slotsOn('2026-10-12')).find(slot => slot.available);
+    const body = { doctorId: 'doc_1', slotId: free!.id };
+
+    expect(
+      (await mockRequest({ method: 'POST', path: '/bookings', body }, settings))
+        .status,
+    ).toBe(201);
+    expect(
+      (await mockRequest({ method: 'POST', path: '/bookings', body }, settings))
+        .status,
+    ).toBe(409);
+    expect(
+      (await slotsOn('2026-10-12')).find(slot => slot.id === free!.id)
+        ?.available,
+    ).toBe(false);
+  });
+});
