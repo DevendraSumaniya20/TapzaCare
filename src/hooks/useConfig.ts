@@ -17,6 +17,9 @@ export function useConfig() {
     // True only before the first config ever arrives; later switches keep showing the old one.
     isLoading,
     isFetching,
-    refetch,
+    // Wrapped so callers get a plain () => void for buttons and pull-to-refresh.
+    refetch: () => {
+      refetch();
+    },
   };
 }

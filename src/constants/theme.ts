@@ -42,7 +42,7 @@ export const FALLBACK_CONFIG: LayoutConfig = {
     surface: '#FFFFFF',
     textPrimary: '#10231F',
     textSecondary: '#4B635E',
-    accent: '#D97706',
+    accent: '#B45309',
   },
   tabs: [
     { id: 'home', label: 'Home', icon: 'home', screen: 'home' },
