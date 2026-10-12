@@ -8,12 +8,14 @@ import { setupListeners } from '@reduxjs/toolkit/query';
 import { useDispatch, useSelector } from 'react-redux';
 import { api } from '../services/api';
 import bookings from './bookingsSlice';
+import doses from './dosesSlice';
 import settings from './settingsSlice';
 
 export const store = configureStore({
   reducer: {
     settings,
     bookings,
+    doses,
     [api.reducerPath]: api.reducer,
   },
   middleware: getDefaultMiddleware =>
