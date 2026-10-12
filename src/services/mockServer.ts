@@ -1,6 +1,8 @@
 import { festivalConfig, normalConfig } from '../data/configs';
+import { localize } from '../data/configTranslations';
 import { doctors } from '../data/doctors';
 import { prescriptions } from '../data/prescriptions';
+import type { Language } from '../i18n';
 import type { Booking, Slot } from '../types/api';
 
 export type ConfigVariant = 'normal' | 'festival';
@@ -9,6 +11,8 @@ export type FailureMode = 'none' | 'config' | 'bookings' | 'all';
 
 export type MockSettings = {
   variant: ConfigVariant;
+  // Plays the role of the Accept-Language header.
+  language: Language;
   latencyMs: number;
   failure: FailureMode;
 };
@@ -112,7 +116,10 @@ export async function mockRequest(
     case '/config':
       return {
         status: 200,
-        data: settings.variant === 'festival' ? festivalConfig : normalConfig,
+        data: localize(
+          settings.variant === 'festival' ? festivalConfig : normalConfig,
+          settings.language,
+        ),
       };
     case '/doctors':
       return { status: 200, data: doctors };

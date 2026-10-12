@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 import { MIN_TAP_TARGET } from '../constants/theme';
 import { useTheme } from '../hooks/useTheme';
+import { haptics } from '../utils/haptics';
 import { AppText } from './AppText';
 
 type Props<T> = {
@@ -33,7 +34,10 @@ export function OptionGroup<T extends string | number>({
               key={option.value}
               accessibilityRole="radio"
               accessibilityState={{ selected: isSelected }}
-              onPress={() => onSelect(option.value)}
+              onPress={() => {
+                haptics.select();
+                onSelect(option.value);
+              }}
               style={[
                 styles.chip,
                 {

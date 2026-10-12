@@ -5,7 +5,11 @@ import { useAppSelector } from '../store';
 /** The remote layout config for the day the mock is set to, plus where it came from. */
 export function useConfig() {
   const variant = useAppSelector(state => state.settings.variant);
-  const { data, isLoading, isFetching, refetch } = useGetConfigQuery(variant);
+  const language = useAppSelector(state => state.settings.language);
+  const { data, isLoading, isFetching, refetch } = useGetConfigQuery({
+    variant,
+    language,
+  });
 
   return {
     config: data?.config ?? FALLBACK_CONFIG,

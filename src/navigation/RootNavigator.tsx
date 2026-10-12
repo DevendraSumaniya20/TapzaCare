@@ -9,6 +9,7 @@ import { HomeScreen } from '../screens/HomeScreen';
 import { PrescriptionsScreen } from '../screens/PrescriptionsScreen';
 import { ProfileScreen } from '../screens/ProfileScreen';
 import type { TabScreen } from '../types/api';
+import { haptics } from '../utils/haptics';
 
 // The config names a screen; this is the only place that name meets a component.
 const SCREENS: Record<TabScreen, ComponentType> = {
@@ -45,6 +46,7 @@ export function RootNavigator() {
       }}
     >
       <Tab.Navigator
+        screenListeners={{ tabPress: haptics.select }}
         screenOptions={{
           headerShown: false,
           tabBarActiveTintColor: colors.primary,

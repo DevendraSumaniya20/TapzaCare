@@ -3,10 +3,11 @@ import {
   resetMockServer,
   type MockSettings,
 } from '../src/services/mockServer';
-import type { Slot } from '../src/types/api';
+import type { LayoutConfig, Slot } from '../src/types/api';
 
 const settings: MockSettings = {
   variant: 'normal',
+  language: 'en',
   latencyMs: 0,
   failure: 'none',
 };
@@ -32,6 +33,15 @@ describe('mock server', () => {
       { ...settings, variant: 'festival' },
     );
     expect(festival.data).not.toEqual(normal.data);
+  });
+
+  it('localises config content for the requested language', async () => {
+    const hindi = await mockRequest(
+      { method: 'GET', path: '/config' },
+      { ...settings, language: 'hi' },
+    );
+    const labels = (hindi.data as LayoutConfig).tabs.map(tab => tab.label);
+    expect(labels).toEqual(['होम', 'बुकिंग', 'पर्चे', 'प्रोफ़ाइल']);
   });
 
   it('fails only the endpoints the failure switch names', async () => {

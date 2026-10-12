@@ -1,5 +1,6 @@
 import { createApi, type BaseQueryFn } from '@reduxjs/toolkit/query/react';
 import { FALLBACK_CONFIG } from '../constants/theme';
+import type { Language } from '../i18n';
 import type { RootState } from '../store';
 import type {
   Booking,
@@ -50,9 +51,12 @@ export const api = createApi({
   baseQuery: mockBaseQuery,
   tagTypes: ['Slots'],
   endpoints: build => ({
-    // The variant argument only keys the cache, so switching the day refetches. The mock picks the config itself.
-    getConfig: build.query<ConfigResult, ConfigVariant>({
-      queryFn: async (_variant, _api, _options, baseQuery) => {
+    // The argument only keys the cache, so switching day or language refetches. The mock reads both itself.
+    getConfig: build.query<
+      ConfigResult,
+      { variant: ConfigVariant; language: Language }
+    >({
+      queryFn: async (_key, _api, _options, baseQuery) => {
         const response = await baseQuery({ method: 'GET', path: '/config' });
         if (!response.error) {
           try {

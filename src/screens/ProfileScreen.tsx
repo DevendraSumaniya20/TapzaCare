@@ -1,42 +1,55 @@
 import { ScrollView } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '../components/AppText';
 import { OptionGroup } from '../components/OptionGroup';
 import { useConfig } from '../hooks/useConfig';
 import { useTheme } from '../hooks/useTheme';
+import { LANGUAGES, saveLanguage, type Language } from '../i18n';
 import type { ConfigVariant, FailureMode } from '../services/mockServer';
 import { useAppDispatch, useAppSelector } from '../store';
-import { setFailure, setLatency, setVariant } from '../store/settingsSlice';
+import {
+  setFailure,
+  setLanguage,
+  setLatency,
+  setVariant,
+} from '../store/settingsSlice';
 
-const VARIANTS: { value: ConfigVariant; label: string }[] = [
-  { value: 'normal', label: 'Normal day' },
-  { value: 'festival', label: 'Festival day' },
-];
-const LATENCIES = [
-  { value: 0, label: 'Instant' },
-  { value: 600, label: 'Normal' },
-  { value: 3000, label: 'Slow (3s)' },
-];
-const FAILURES: { value: FailureMode; label: string }[] = [
-  { value: 'none', label: 'None' },
-  { value: 'config', label: 'Config' },
-  { value: 'bookings', label: 'Bookings' },
-  { value: 'all', label: 'Everything' },
-];
+const SOURCE_KEY = {
+  network: 'profile.sourceNetwork',
+  cache: 'profile.sourceCache',
+  bundled: 'profile.sourceBundled',
+} as const;
 
-const SOURCE_LABEL = {
-  network: 'Fresh from server',
-  cache: 'Saved copy (server unreachable)',
-  bundled: 'Built-in default (server unreachable, nothing saved)',
-};
-
-/** Profile tab. For now it holds the mock-backend switches the brief asks for. */
+/** Profile tab: language, plus the mock-backend switches the brief asks for. */
 export function ProfileScreen() {
+  const { t } = useTranslation();
   const { colors, spacing } = useTheme();
   const insets = useSafeAreaInsets();
   const dispatch = useAppDispatch();
   const settings = useAppSelector(state => state.settings);
   const { config, source } = useConfig();
+
+  const variants: { value: ConfigVariant; label: string }[] = [
+    { value: 'normal', label: t('profile.normalDay') },
+    { value: 'festival', label: t('profile.festivalDay') },
+  ];
+  const latencies = [
+    { value: 0, label: t('profile.instant') },
+    { value: 600, label: t('profile.normal') },
+    { value: 3000, label: t('profile.slow') },
+  ];
+  const failures: { value: FailureMode; label: string }[] = [
+    { value: 'none', label: t('profile.failNone') },
+    { value: 'config', label: t('profile.failConfig') },
+    { value: 'bookings', label: t('profile.failBookings') },
+    { value: 'all', label: t('profile.failAll') },
+  ];
+
+  const changeLanguage = (language: Language) => {
+    dispatch(setLanguage(language));
+    saveLanguage(language);
+  };
 
   return (
     <ScrollView
@@ -48,27 +61,35 @@ export function ProfileScreen() {
       }}
     >
       <AppText variant="title" bold>
-        Profile
-      </AppText>
-      <AppText color={colors.textSecondary}>
-        Demo controls for the mock server. Config version {config.version}
-        {source ? ` · ${SOURCE_LABEL[source]}` : ''}
+        {t('profile.title')}
       </AppText>
       <OptionGroup
-        label="Home layout"
-        options={VARIANTS}
+        label={t('profile.language')}
+        options={LANGUAGES}
+        selected={settings.language}
+        onSelect={changeLanguage}
+      />
+      <AppText color={colors.textSecondary}>
+        {t('profile.demoControls')}
+        {' · '}
+        {t('profile.configVersion', { version: config.version })}
+        {source ? ` · ${t(SOURCE_KEY[source])}` : ''}
+      </AppText>
+      <OptionGroup
+        label={t('profile.homeLayout')}
+        options={variants}
         selected={settings.variant}
         onSelect={value => dispatch(setVariant(value))}
       />
       <OptionGroup
-        label="Network speed"
-        options={LATENCIES}
+        label={t('profile.networkSpeed')}
+        options={latencies}
         selected={settings.latencyMs}
         onSelect={value => dispatch(setLatency(value))}
       />
       <OptionGroup
-        label="Fail requests"
-        options={FAILURES}
+        label={t('profile.failRequests')}
+        options={failures}
         selected={settings.failure}
         onSelect={value => dispatch(setFailure(value))}
       />

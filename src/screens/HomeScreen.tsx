@@ -1,13 +1,15 @@
 import { House } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
 import { StateView } from '../components/StateView';
 
 // Placeholder until the config-driven home lands on feature/home.
 export function HomeScreen() {
+  const { t } = useTranslation();
   return (
     <StateView
       icon={House}
-      title="Home"
-      message="Your clinic services will appear here."
+      title={t('home.emptyTitle')}
+      message={t('home.emptyMessage')}
     />
   );
 }

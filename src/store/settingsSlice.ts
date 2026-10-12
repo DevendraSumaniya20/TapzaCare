@@ -1,4 +1,5 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import type { Language } from '../i18n';
 import type {
   ConfigVariant,
   FailureMode,
@@ -8,6 +9,7 @@ import type {
 // Controls for the mock backend. Read by the API layer on every request.
 const initialState: MockSettings = {
   variant: 'normal',
+  language: 'en',
   latencyMs: 600,
   failure: 'none',
 };
@@ -19,6 +21,9 @@ const settingsSlice = createSlice({
     setVariant: (state, action: PayloadAction<ConfigVariant>) => {
       state.variant = action.payload;
     },
+    setLanguage: (state, action: PayloadAction<Language>) => {
+      state.language = action.payload;
+    },
     setLatency: (state, action: PayloadAction<number>) => {
       state.latencyMs = action.payload;
     },
@@ -28,5 +33,6 @@ const settingsSlice = createSlice({
   },
 });
 
-export const { setVariant, setLatency, setFailure } = settingsSlice.actions;
+export const { setVariant, setLanguage, setLatency, setFailure } =
+  settingsSlice.actions;
 export default settingsSlice.reducer;
