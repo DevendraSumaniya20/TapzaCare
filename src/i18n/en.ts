@@ -77,6 +77,15 @@ export const en = {
     emptyTitle: 'No prescriptions yet',
     emptyMessage: 'Prescriptions from your doctor will appear here.',
   },
+  reminders: {
+    toggle: 'Remind me every day',
+    hint: 'At 8:00 am, 2:00 pm and 9:00 pm, for the medicines due then.',
+    denied:
+      'Notifications are turned off for Tapza Care. Turn them on in your phone settings.',
+    test: 'Send a test reminder in 10 seconds',
+    title: '{{time}} medicines',
+    channel: 'Medicine reminders',
+  },
   profile: {
     appearance: 'Appearance',
     appearanceSystem: 'System',

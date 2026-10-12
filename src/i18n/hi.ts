@@ -77,6 +77,15 @@ export const hi: Translations = {
     emptyTitle: 'अभी कोई पर्चा नहीं',
     emptyMessage: 'आपके डॉक्टर के पर्चे यहाँ दिखेंगे।',
   },
+  reminders: {
+    toggle: 'मुझे रोज़ याद दिलाएँ',
+    hint: 'सुबह 8:00, दोपहर 2:00 और रात 9:00 बजे, उस समय की दवाइयों के लिए।',
+    denied:
+      'Tapza Care के लिए नोटिफ़िकेशन बंद हैं। फ़ोन की सेटिंग में इन्हें चालू करें।',
+    test: '10 सेकंड में टेस्ट रिमाइंडर भेजें',
+    title: '{{time}} की दवाइयाँ',
+    channel: 'दवा रिमाइंडर',
+  },
   profile: {
     appearance: 'रूप',
     appearanceSystem: 'सिस्टम',

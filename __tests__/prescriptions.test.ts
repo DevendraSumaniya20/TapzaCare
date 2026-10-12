@@ -1,6 +1,6 @@
 import { prescriptions } from '../src/data/prescriptions';
 import reducer, { doseToggled, dosesLoaded } from '../src/store/dosesSlice';
-import { buildSchedule, doseKey } from '../src/utils/schedule';
+import { buildSchedule, doseKey, nextOccurrence } from '../src/utils/schedule';
 
 describe('buildSchedule', () => {
   it('groups medicines by time of day, in morning-afternoon-night order', () => {
@@ -43,5 +43,18 @@ describe('doses reducer', () => {
     expect(reducer({ old: true }, dosesLoaded({ [key]: true }))).toEqual({
       [key]: true,
     });
+  });
+});
+
+describe('nextOccurrence', () => {
+  const at = (hour: number, minute = 0) => new Date(2026, 9, 12, hour, minute);
+
+  it('is later today when the hour has not come yet', () => {
+    expect(nextOccurrence(14, at(9, 30))).toEqual(at(14));
+  });
+
+  it('is tomorrow when the hour has passed or is exactly now', () => {
+    expect(nextOccurrence(8, at(9, 30))).toEqual(new Date(2026, 9, 13, 8));
+    expect(nextOccurrence(8, at(8))).toEqual(new Date(2026, 9, 13, 8));
   });
 });

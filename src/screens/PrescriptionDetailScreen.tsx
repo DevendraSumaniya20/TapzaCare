@@ -12,6 +12,7 @@ import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '../components/AppText';
 import { DoseRow } from '../components/prescriptions/DoseRow';
+import { ReminderCard } from '../components/prescriptions/ReminderCard';
 import { StateView } from '../components/StateView';
 import { usePulse } from '../hooks/usePulse';
 import { useTheme } from '../hooks/useTheme';
@@ -161,6 +162,8 @@ export function PrescriptionDetailScreen({ route }: Props) {
           />
         </View>
       </View>
+
+      <ReminderCard prescription={prescription} />
 
       {schedule.map(group => {
         const Icon = TIMING_ICON[group.timing];
