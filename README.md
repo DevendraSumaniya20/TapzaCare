@@ -35,7 +35,19 @@ npm run lint
 
 ### Install the APK
 
-TODO (Devendra): link to the GitHub Release. To build one locally: `cd android && ./gradlew assembleRelease`, then install `android/app/build/outputs/apk/release/app-release.apk` with `adb install`.
+Download `app-release.apk` from the [latest GitHub Release](https://github.com/DevendraSumaniya20/TapzaCare/releases/latest).
+
+- **On a phone:** open the downloaded file and allow "Install unknown apps" for your browser or file manager when Android asks.
+- **From a computer:** `adb install -r app-release.apk`
+
+The APK is a release build: the JavaScript is bundled inside it, so it runs without Metro. It is signed with the template's debug key, which is fine for review but not for the Play Store.
+
+### Build the APK yourself
+
+```sh
+npm run apk            # builds android/app/build/outputs/apk/release/app-release.apk
+npm run apk:install    # installs it on the connected device or emulator
+```
 
 ## Using the app, start to finish
 
