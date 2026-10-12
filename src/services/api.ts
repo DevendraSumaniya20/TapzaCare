@@ -89,11 +89,35 @@ export const api = createApi({
       query: params => ({ method: 'GET', path: '/slots', params }),
       providesTags: ['Slots'],
     }),
+    // `date` is not sent; it identifies which cached slot list to update.
     createBooking: build.mutation<
       Booking,
-      { doctorId: string; slotId: string }
+      { doctorId: string; slotId: string; date: string }
     >({
-      query: body => ({ method: 'POST', path: '/bookings', body }),
+      query: ({ doctorId, slotId }) => ({
+        method: 'POST',
+        path: '/bookings',
+        body: { doctorId, slotId },
+      }),
+      // Optimistic update: the slot shows as taken immediately. If the server refuses, undo it.
+      async onQueryStarted(
+        { doctorId, slotId, date },
+        { dispatch, queryFulfilled },
+      ) {
+        const patch = dispatch(
+          api.util.updateQueryData('getSlots', { doctorId, date }, slots => {
+            const slot = slots.find(candidate => candidate.id === slotId);
+            if (slot) slot.available = false;
+          }),
+        );
+        try {
+          await queryFulfilled;
+        } catch {
+          patch.undo();
+        }
+      },
+      // Reconcile: whatever happened, refetch slots so the list matches the server.
+      invalidatesTags: ['Slots'],
     }),
     getPrescriptions: build.query<Prescription[], void>({
       query: () => ({ method: 'GET', path: '/prescriptions' }),

@@ -1,13 +1,19 @@
 import NetInfo from '@react-native-community/netinfo';
-import { configureStore } from '@reduxjs/toolkit';
+import {
+  configureStore,
+  type ThunkAction,
+  type UnknownAction,
+} from '@reduxjs/toolkit';
 import { setupListeners } from '@reduxjs/toolkit/query';
 import { useDispatch, useSelector } from 'react-redux';
 import { api } from '../services/api';
+import bookings from './bookingsSlice';
 import settings from './settingsSlice';
 
 export const store = configureStore({
   reducer: {
     settings,
+    bookings,
     [api.reducerPath]: api.reducer,
   },
   middleware: getDefaultMiddleware =>
@@ -24,6 +30,12 @@ setupListeners(store.dispatch, (dispatch, { onOnline, onOffline }) =>
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
+export type AppThunk<Result = void> = ThunkAction<
+  Result,
+  RootState,
+  unknown,
+  UnknownAction
+>;
 
 export const useAppDispatch = useDispatch.withTypes<AppDispatch>();
 export const useAppSelector = useSelector.withTypes<RootState>();
