@@ -15,22 +15,52 @@ The APK and the video are too large for the repository, so both are hosted on Go
 
 ## Run it
 
-Requirements: Node 22.11 or newer, a JDK and Android Studio with an emulator, and for iOS Xcode with CocoaPods.
+There is no backend to start and no `.env` file: the mock API runs inside the app.
+
+### 1. What you need
+
+- Node 22.11 or newer
+- **Android:** Android Studio with the Android SDK, JDK 17 or newer, and an emulator or a phone with USB debugging on
+- **iOS (Mac only):** Xcode and CocoaPods
+
+If this is your first React Native project on this machine, follow the official [environment setup](https://reactnative.dev/docs/set-up-your-environment) first.
+
+### 2. Get the code
 
 ```sh
+git clone https://github.com/DevendraSumaniya20/TapzaCare.git
+cd TapzaCare
 npm install
+```
 
-# Android
+### 3. Run on Android
+
+Start an emulator from Android Studio (or plug in a phone and check it shows in `adb devices`), then:
+
+```sh
 npm run android
+```
 
-# iOS
+### 4. Run on iOS
+
+```sh
 cd ios && pod install && cd ..
 npm run ios
 ```
 
-`npm run android` and `npm run ios` start Metro for you. If you change `babel.config.js`, restart Metro with `npm start -- --reset-cache`.
+Run `pod install` again whenever `package.json` changes.
 
-Checks:
+`npm run android` and `npm run ios` build the app, install it and start Metro (the JavaScript bundler) in a new terminal window. If Metro does not open, run `npm start` in one terminal and the run command in another.
+
+### If something goes wrong
+
+- **Old code or a red screen after changing `babel.config.js`:** stop Metro and run `npm start -- --reset-cache`.
+- **Android build fails after pulling changes:** `cd android && ./gradlew clean && cd ..`, then `npm run android` again.
+- **"SDK location not found":** open the `android` folder in Android Studio once, or set `ANDROID_HOME` to your SDK path.
+- **`bundle exec pod install` fails on a new Ruby:** use plain `pod install` as shown above.
+- **Phone cannot reach Metro:** run `adb reverse tcp:8081 tcp:8081`.
+
+### Checks
 
 ```sh
 npm test          # 77 Jest tests
