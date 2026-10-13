@@ -6,7 +6,12 @@ A React Native app for patients of a neighbourhood clinic, built for the Tapza C
 - Three screens from the brief: config-driven Home, Booking, Prescriptions and reminders
 - Mock backend inside the app, with switches for latency and failure
 
-> **TODO (Devendra) before submitting:** fill in "Time spent", add the screenshots and video to `/docs`, publish the APK and paste its link under "Install the APK".
+- **Demo video:** [TapzaCare demo](https://drive.google.com/file/d/1yD8fQF_gTJS7IkqgUOFWXL_l9NlVOp33/view?usp=sharing) (Google Drive)
+- **APK:** [TapzaCare-v1.0.apk](https://drive.google.com/file/d/1QLVAm2FvRbub5bH6WfQmfLnlGUnGuI15/view?usp=drive_link) (Google Drive)
+
+The APK and the video are too large for the repository, so both are hosted on Google Drive.
+
+> **TODO (Devendra) before submitting:** fill in "Time spent" and add the screenshots to `/docs`.
 
 ## Run it
 
@@ -35,10 +40,10 @@ npm run lint
 
 ### Install the APK
 
-Download `app-release.apk` from the [latest GitHub Release](https://github.com/DevendraSumaniya20/TapzaCare/releases/latest).
+Download [`TapzaCare-v1.0.apk` from Google Drive](https://drive.google.com/file/d/1QLVAm2FvRbub5bH6WfQmfLnlGUnGuI15/view?usp=drive_link).
 
 - **On a phone:** open the downloaded file and allow "Install unknown apps" for your browser or file manager when Android asks.
-- **From a computer:** `adb install -r app-release.apk`
+- **From a computer:** `adb install -r TapzaCare-v1.0.apk`
 
 The APK is a release build: the JavaScript is bundled inside it, so it runs without Metro. It is signed with the template's debug key, which is fine for review but not for the Play Store.
 
